@@ -4,11 +4,11 @@ En **Nurse in Tech** queremos incorporar la innovación tecnológica, programaci
 
 Este curso se enmarca en el desarrollo de competencias avanzadas en análisis de datos.
 
-![](img/curso.jpg){width="800"}
+![](img/curso.jpg)
 
 ## 
 
-Requisitos previos al curso
+## Requisitos previos al curso
 
 1.  [Instala R](https://cloud.r-project.org/) en tu computador. Elige la versión que corresponda a tu sistema operativo.
 
