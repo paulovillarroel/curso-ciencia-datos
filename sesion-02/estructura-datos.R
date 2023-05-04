@@ -29,13 +29,19 @@ sort(vec, decreasing = TRUE)
 df <- data.frame(edad = c(12, 43, 23),
                  nombre = c("Paulo", "Ana", "Pedro"),
                  ciudad = c("Santiago", "Chiloe", "Arica"))
+df
 
 nombre <- c("Paulo", "Maria", "Jose")
-edad <- c(23, 43, 18)
+edad <- c(23, 43, NA)
 
 df2 <- data.frame(nombre, edad)
 
 sum(df) #error
+
+df$edad
+df$nombre
+df$ciudad
+
 sum(df$edad)
 str(df)
 class(df)
@@ -55,6 +61,9 @@ df |>
   select(2)
 
 df |> 
+  select(nombre)
+
+df3 <- df |> 
   arrange(desc(edad))
 
 
