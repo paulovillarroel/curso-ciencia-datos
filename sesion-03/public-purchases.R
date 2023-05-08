@@ -49,22 +49,25 @@ unlink("sesion-03/raw-data/*")
 glimpse(ordenes_compra)
 
 # Es necesario cambiar la marca de decimal
-lista_archivos[[1]] |> 
-  mutate(MontoTotalOC_PesosChilenos = str_replace(MontoTotalOC_PesosChilenos, ",", "."),
-         MontoTotalOC_PesosChilenos = as.numeric(MontoTotalOC_PesosChilenos))
+lista_archivos[[1]] |>
+  mutate(
+    MontoTotalOC_PesosChilenos = str_replace(MontoTotalOC_PesosChilenos, ",", "."),
+    MontoTotalOC_PesosChilenos = as.numeric(MontoTotalOC_PesosChilenos)
+  )
 
 # Aplicamos el ajuste del decimal a todo el dataset
-ordenes_compra  <- ordenes_compra |> 
-  mutate(MontoTotalOC_PesosChilenos = str_replace(MontoTotalOC_PesosChilenos, ",", "."),
-         MontoTotalOC_PesosChilenos = as.numeric(MontoTotalOC_PesosChilenos))
-  
-  
+ordenes_compra <- ordenes_compra |>
+  mutate(
+    MontoTotalOC_PesosChilenos = str_replace(MontoTotalOC_PesosChilenos, ",", "."),
+    MontoTotalOC_PesosChilenos = as.numeric(MontoTotalOC_PesosChilenos)
+  )
+
 
 oc_san_miguel <- ordenes_compra |>
   filter(OrganismoPublico == "I MUNICIPALIDAD DE SAN MIGUEL")
 
 oc_san_miguel |>
-  janitor::tabyl(EsTratoDirecto) |> 
+  janitor::tabyl(EsTratoDirecto) |>
   janitor::adorn_totals()
 
 oc_san_miguel |>
@@ -75,7 +78,7 @@ oc_san_miguel |>
   group_by(NombreProveedor) |>
   summarise(totalMonto = sum(MontoTotalOC_PesosChilenos)) |>
   arrange(desc(totalMonto)) |>
-  top_n(20) |> 
+  top_n(20) |>
   ungroup()
 
 # .by Nuevo en dplyr 1.1.0 https://dplyr.tidyverse.org/news/index.html#dplyr-110
@@ -84,7 +87,7 @@ oc_san_miguel |>
     Estado != "Cancelacion solicitada",
     EsTratoDirecto == "Si"
   ) |>
-  summarise(totalMonto = sum(MontoTotalOC_PesosChilenos), .by = NombreProveedor) |> 
+  summarise(totalMonto = sum(MontoTotalOC_PesosChilenos), .by = NombreProveedor) |>
   arrange(desc(totalMonto)) |>
   top_n(20)
 
@@ -105,14 +108,14 @@ municipalidades_td <- ordenes_compra |>
     Estado != "Cancelacion solicitada",
     EsTratoDirecto == "Si"
   ) |>
-  group_by(OrganismoPublico, NombreProveedor) |> 
+  group_by(OrganismoPublico, NombreProveedor) |>
   summarise(totalMonto = sum(MontoTotalOC_PesosChilenos)) |>
   arrange(desc(totalMonto)) |>
-  top_n(10, totalMonto) |> 
+  top_n(10, totalMonto) |>
   ungroup()
 
 
-municipalidades_td |> 
+municipalidades_td |>
   slice_max(totalMonto)
 
 # Top 10 Proveedores
@@ -125,3 +128,10 @@ ordenes_compra |>
   summarise(totalMonto = sum(MontoTotalOC_PesosChilenos), .by = NombreProveedor) |>
   arrange(desc(totalMonto)) |>
   top_n(10, totalMonto)
+
+
+# Ejercicio ----
+
+# Explorar los datos del sector salud
+oc_salud_salud <- ordenes_compra |>
+  filter(sector == "Salud")
