@@ -70,6 +70,10 @@ oc_san_miguel |>
   janitor::tabyl(EsTratoDirecto) |>
   janitor::adorn_totals()
 
+oc_san_miguel |> 
+  filter(MontoTotalOC_PesosChilenos == max(MontoTotalOC_PesosChilenos)) |> 
+  pull(MontoTotalOC_PesosChilenos)
+
 oc_san_miguel |>
   filter(
     Estado != "Cancelacion solicitada",
@@ -90,6 +94,7 @@ oc_san_miguel |>
   summarise(totalMonto = sum(MontoTotalOC_PesosChilenos), .by = NombreProveedor) |>
   arrange(desc(totalMonto)) |>
   top_n(20)
+
 
 oc_san_miguel |>
   filter(
