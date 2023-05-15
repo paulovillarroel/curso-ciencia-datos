@@ -33,7 +33,7 @@ lista_archivos <- list.files("sesion-03/raw-data", pattern = "*.csv", full.names
   purrr::map(~ fread(., encoding = "Latin-1"))
 
 # Arrojan un error de tipo de datos:
-# rbindlist(ordenes_compra)
+# rbindlist(lista_archivos)
 # bind_rows(lista_archivos)
 # map_df()
 
@@ -46,25 +46,62 @@ unlink("sesion-03/raw-data/*")
 
 # Veamos un poco el dataset ----
 
-glimpse(ordenes_compra)
-
-# Es necesario cambiar la marca de decimal
-lista_archivos[[1]] |>
-  mutate(
-    MontoTotalOC_PesosChilenos = str_replace(MontoTotalOC_PesosChilenos, ",", "."),
-    MontoTotalOC_PesosChilenos = as.numeric(MontoTotalOC_PesosChilenos)
-  )
-
-# Aplicamos el ajuste del decimal a todo el dataset
+# Aplicamos el ajuste del decimal a todo el dataset y cambiamos los tipos de datos
 ordenes_compra <- ordenes_compra |>
   mutate(
     MontoTotalOC_PesosChilenos = str_replace(MontoTotalOC_PesosChilenos, ",", "."),
-    MontoTotalOC_PesosChilenos = as.numeric(MontoTotalOC_PesosChilenos)
+    MontoTotalOC_PesosChilenos = as.numeric(MontoTotalOC_PesosChilenos),
+    across(starts_with("Fecha"), as.Date),
+    across(starts_with("fecha"), as.Date)
   )
 
+glimpse(ordenes_compra)
 
+colnames(ordenes_compra)
+
+
+# Ver valores perdidos 
+ordenes_compra |> 
+  DataExplorer::plot_missing()
+
+miss_value <- naniar::miss_summary(ordenes_compra)
+
+
+
+oc_montos <- ordenes_compra$MontoTotalOC_PesosChilenos
+
+format(max(oc_montos), scientific = FALSE, big.mark = ",")
+
+ordenes_compra |> 
+  filter(MontoTotalOC_PesosChilenos == max(MontoTotalOC_PesosChilenos)) |> 
+  pull(ID)
+
+format(
+ordenes_compra |> 
+  filter(EsTratoDirecto == "Si") |> 
+  pull(MontoTotalOC_PesosChilenos) |> 
+  max()
+, big.mark = ",")
+
+
+# Subseting
 oc_san_miguel <- ordenes_compra |>
   filter(OrganismoPublico == "I MUNICIPALIDAD DE SAN MIGUEL")
+
+skimr::skim(oc_san_miguel)
+
+
+hist(oc_san_miguel$MontoTotalOC_PesosChilenos, breaks = 400)
+
+oc_san_miguel |> 
+  ggplot(aes(MontoTotalOC_PesosChilenos)) +
+  geom_histogram(bins = 400)
+
+oc_san_miguel |> 
+  ggplot(aes(MontoTotalOC_PesosChilenos)) +
+  geom_histogram(bins = 400) +
+  scale_x_continuous(labels = scales::comma)
+
 
 oc_san_miguel |>
   janitor::tabyl(EsTratoDirecto) |>
@@ -72,7 +109,7 @@ oc_san_miguel |>
 
 oc_san_miguel |> 
   filter(MontoTotalOC_PesosChilenos == max(MontoTotalOC_PesosChilenos)) |> 
-  pull(MontoTotalOC_PesosChilenos)
+  pull(ID)
 
 oc_san_miguel |>
   filter(
@@ -94,7 +131,6 @@ oc_san_miguel |>
   summarise(totalMonto = sum(MontoTotalOC_PesosChilenos), .by = NombreProveedor) |>
   arrange(desc(totalMonto)) |>
   top_n(20)
-
 
 oc_san_miguel |>
   filter(
@@ -124,7 +160,7 @@ municipalidades_td |>
   slice_max(totalMonto)
 
 # Top 10 Proveedores
-ordenes_compra |>
+top_10_proveedores <- ordenes_compra |>
   filter(
     sector == "Municipalidades",
     Estado != "Cancelacion solicitada",
@@ -133,6 +169,15 @@ ordenes_compra |>
   summarise(totalMonto = sum(MontoTotalOC_PesosChilenos), .by = NombreProveedor) |>
   arrange(desc(totalMonto)) |>
   top_n(10, totalMonto)
+
+
+# Un breve gráfico
+top_10_proveedores |>
+  ggplot(aes(fct_reorder(NombreProveedor, totalMonto), totalMonto )) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma)
+  
 
 
 # Ejercicio ----
