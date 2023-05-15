@@ -61,14 +61,18 @@ colnames(ordenes_compra)
 
 
 # Ver valores perdidos 
+options(scipen = 999)
+
 ordenes_compra |> 
   DataExplorer::plot_missing()
 
-miss_value <- naniar::miss_summary(ordenes_compra)
-
+colSums(is.na(ordenes_compra)) |> 
+  sort(decreasing = TRUE)
 
 
 oc_montos <- ordenes_compra$MontoTotalOC_PesosChilenos
+
+summary(oc_montos)
 
 format(max(oc_montos), scientific = FALSE, big.mark = ",")
 
@@ -91,16 +95,34 @@ oc_san_miguel <- ordenes_compra |>
 skimr::skim(oc_san_miguel)
 
 
-hist(oc_san_miguel$MontoTotalOC_PesosChilenos, breaks = 400)
+hist(oc_san_miguel$MontoTotalOC_PesosChilenos, breaks = 1000)
 
 oc_san_miguel |> 
   ggplot(aes(MontoTotalOC_PesosChilenos)) +
-  geom_histogram(bins = 400)
+  geom_histogram(bins = 1000)
 
 oc_san_miguel |> 
   ggplot(aes(MontoTotalOC_PesosChilenos)) +
-  geom_histogram(bins = 400) +
+  geom_histogram(bins = 1000) +
   scale_x_continuous(labels = scales::comma)
+
+
+boxplot(oc_san_miguel$MontoTotalOC_PesosChilenos, outline = FALSE)
+
+stats <- boxplot.stats(oc_san_miguel$MontoTotalOC_PesosChilenos)
+# Q1 – 1,5 IQR
+# Q1
+# Mediana o Q2
+# Q3
+# Q3 + 1,5 IQR
+
+
+oc_san_miguel_sin_out <- oc_san_miguel |> 
+  filter(!MontoTotalOC_PesosChilenos %in% stats$out)
+
+boxplot(oc_san_miguel_sin_out$MontoTotalOC_PesosChilenos)
+
+boxplot.stats(oc_san_miguel_sin_out$MontoTotalOC_PesosChilenos)
 
 
 oc_san_miguel |>
@@ -183,5 +205,5 @@ top_10_proveedores |>
 # Ejercicio ----
 
 # Explorar los datos del sector salud
-oc_salud_salud <- ordenes_compra |>
+oc_salud <- ordenes_compra |>
   filter(sector == "Salud")
