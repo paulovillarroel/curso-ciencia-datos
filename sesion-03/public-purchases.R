@@ -90,7 +90,10 @@ ordenes_compra |>
 
 # Subseting
 oc_san_miguel <- ordenes_compra |>
-  filter(OrganismoPublico == "I MUNICIPALIDAD DE SAN MIGUEL")
+  filter(OrganismoPublico == "I MUNICIPALIDAD DE SAN MIGUEL") |> 
+  mutate(OrganismoPublico = str_to_sentence(OrganismoPublico))
+
+
 
 skimr::skim(oc_san_miguel)
 
