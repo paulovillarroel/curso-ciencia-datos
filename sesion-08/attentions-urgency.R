@@ -37,7 +37,12 @@ respiratory_cause_childs <- data |>
   rowwise() |> 
   mutate(ped = sum(menores_1, de_1_a_4, de_5_a_14)) |> 
   group_by(semana) |> 
-  summarise(total = sum(ped))
+  summarise(menores_1 = sum(menores_1),
+            de_1_a_4 = sum(de_1_a_4),
+            de_5_a_14 = sum(de_5_a_14)) |> 
+  pivot_longer(cols = -semana,
+               names_to = "grupo_etario",
+               values_to = "n_atenciones")
 
 
 
@@ -76,19 +81,25 @@ ggsave("sesion-08/plot/respiratory_cause_2023.png", height = 10, width = 15)
 
 
 ## Pediatric
+
+respiratory_cause_childs$grupo_etario <- factor(respiratory_cause_childs$grupo_etario,
+                                                labels = c("menores_1", "de_1_a_4", "de_5_a_14"))
+
 respiratory_cause_childs |>
-  ggplot(aes(semana, total)) +
-  geom_area(fill = "#e0aaff", color = "#7b2cbf", size = 2) +
-  geom_point(color = "#724cf9", size = 3) +
+  ggplot(aes(semana, n_atenciones, fill = grupo_etario)) +
+  geom_area() +
   scale_x_continuous(breaks = 1:nrow(respiratory_cause_childs)) +
   scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c("#f72585", "#7209b7", "#7678ed"), 
+                    labels = c("Menores 1 año", "Entre 1 y 4 años", "Entre 5 y 14 años")) +
   theme_grey() +
   labs(
     title = "Atenciones de urgencia por causas respiratorias < 14 años. Chile 2023",
     subtitle = "Se incluyen todos los servicios de urgencia del país\n",
     x = "\nSemana estadística",
     y = "N° de atenciones",
-    caption = "Elaborado por Paulo Villarroel | Fuente: Datos abiertos DEIS"
+    caption = "Elaborado por Paulo Villarroel | Fuente: Datos abiertos DEIS",
+    fill = "Grupo etario"
   ) +
   theme(
     plot.title = element_text(size = 30, face = "bold"),
