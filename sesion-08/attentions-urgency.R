@@ -29,6 +29,8 @@ respiratory_cause <- data |>
   summarise(total = sum(total))
 
 
+# Pediatric attenrions
+
 respiratory_cause_childs <- data |>
   filter(
     glosa_causa == "TOTAL CAUSAS SISTEMA RESPIRATORIO",
@@ -44,6 +46,24 @@ respiratory_cause_childs <- data |>
                names_to = "grupo_etario",
                values_to = "n_atenciones")
 
+
+# Pediatric attentions in hospitals
+
+respiratory_cause_childs_hospital <- data |>
+  filter(
+    glosa_causa == "TOTAL CAUSAS SISTEMA RESPIRATORIO",
+    glosatipoestablecimiento == "Hospital",
+    semana != max(semana)
+  ) |> 
+  rowwise() |> 
+  mutate(ped = sum(menores_1, de_1_a_4, de_5_a_14)) |> 
+  group_by(semana) |> 
+  summarise(menores_1 = sum(menores_1),
+            de_1_a_4 = sum(de_1_a_4),
+            de_5_a_14 = sum(de_5_a_14)) |> 
+  pivot_longer(cols = -semana,
+               names_to = "grupo_etario",
+               values_to = "n_atenciones")
 
 
 # Plot
