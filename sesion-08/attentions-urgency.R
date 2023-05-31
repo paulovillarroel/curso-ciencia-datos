@@ -29,7 +29,7 @@ respiratory_cause <- data |>
   summarise(total = sum(total))
 
 
-# Pediatric attenrions
+# Pediatric attentions
 
 respiratory_cause_childs <- data |>
   filter(
