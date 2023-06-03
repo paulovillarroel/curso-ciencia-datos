@@ -20,4 +20,4 @@ En este repositorio iremos dejando el material de curso, como los scripts, docum
 
 4.  Asegúrate de estar registrado y activo en el Discord de [Nurse in Tech](https://nursein.tech/).
 
-➡️ INICIO 2 MAYO 2023 - 20.00 hrs (GMT -4, Santiago de Chile)
+➡️ CURSO YA FINALIZADO
